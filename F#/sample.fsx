@@ -76,11 +76,16 @@ drawCompareChart sampleA sampleB alcoholFeature
 
 let calculateGradientDecent a b alpha feature actualValue =
     let hypothesis = predictionModel a b feature
+    let length = hypothesis |> Seq.length |> float
+
+    //let mGradient = (-2.0/length) * ((hypothesis ,actualValue, feature) |||> Seq.map3 ( fun hx y x -> ( y- hx) * x )  |> Seq.sum)
+    //let bGradient = (-2.0/length) * (( hypothesis ,actualValue) ||> Seq.map2 ( fun hx y -> ( y - hx) )  |> Seq.sum)
+
     let gradientA =  ( hypothesis ,actualValue) ||> Seq.map2 ( fun hx y -> (hx - y) )  |> Seq.sum
     let gradientB = (hypothesis ,actualValue, feature) |||> Seq.map3 ( fun hx y x -> (hx - y) * x )  |> Seq.sum
 
-    let length = hypothesis |> Seq.length |> float
-    let resultGradientA = (gradientA * alpha) / length
+    
+    let resultGradientA = (gradientA * alpha) /length
     let resultGradientB = (gradientB * alpha) / length
     (resultGradientA, resultGradientB)
 
@@ -99,10 +104,10 @@ let learning alpha steps =
     (a,b)
 
 
-let (a,b) = learning 0.001 150
+let (a,b) = learning 0.001 1000
 
 let testAlcohoFeature = testData |> Seq.map (fun x -> x.Alcohol)
 let testQualityLabels = testData |> Seq.map (fun x -> x.``Residual sugar``)
 let testHypothesis = predictionModel a b alcoholFeature
-let testCost = costFunction testHypothesis testQualityLabels
+
 drawCompareChart a b testAlcohoFeature

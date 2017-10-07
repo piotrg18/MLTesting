@@ -33,10 +33,11 @@ def plotSampleDate(data):
 my_model = Prophet(interval_width=0.01)
 my_model.fit(df)
 
-future_dates = my_model.make_future_dataframe(periods=72, freq='MS')
+future_dates = my_model.make_future_dataframe(periods=200, freq='MS')
 print (future_dates.tail())
 
 forecast = my_model.predict(future_dates)
+
 #forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail()
 
 my_model.plot(forecast,
