@@ -1,6 +1,16 @@
 RESTRICTION: >= net46
 NUGET
   remote: https://www.nuget.org/api/v2
+    Accord (3.7)
+    Accord.MachineLearning (3.7)
+      Accord (>= 3.7)
+      Accord.Math (>= 3.7)
+      Accord.Statistics (>= 3.7)
+    Accord.Math (3.7)
+      Accord (>= 3.7)
+    Accord.Statistics (3.7)
+      Accord (>= 3.7)
+      Accord.Math (>= 3.7)
     FSharp.Data (2.4)
     Google.DataTable.Net.Wrapper (3.1.2)
     Newtonsoft.Json (9.0.1)
