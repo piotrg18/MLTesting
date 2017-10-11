@@ -19,13 +19,14 @@ class NlpClassifier:
     def __init__(self, cluster_node):
         self.dumped_classifier_path = "data\\my_dumped_classifier.pkl"
         self.kmens_dump_path = "data\\my_dumped_kmeans.pkl"
+        self.vectorizer_path = "data\\vectorizer_data.pkl"
         self.cluster_node = cluster_node
+        self.vectorizer = TfidfVectorizer(max_df = 0.5,min_df = 2, stop_words = 'english')
 
     def createKMeans(self):
         self.tmpPosts = []
         with open("data\\articles.txt", "r") as infile:
             self.tmpPosts= json.load(infile)
-        self.vectorizer = TfidfVectorizer(max_df = 0.5,min_df = 2, stop_words = 'english')
         self.X = self.vectorizer.fit_transform(self.tmpPosts)
 
         self.km = KMeans(n_clusters=self.cluster_node, init='k-means++', max_iter=100, n_init=1, verbose=True)
@@ -33,7 +34,9 @@ class NlpClassifier:
     
     def serializeKMeans(self):
         with open(self.kmens_dump_path, 'wb') as fid:
-            cPickle.dump(self.km, fid) 
+            cPickle.dump(self.km, fid)
+        with open(self.vectorizer_path, 'wb') as fid:
+            cPickle.dump(self.vectorizer, fid)  
     
     def deserializeKmeans(self):
         model=None
@@ -87,6 +90,11 @@ class NlpClassifier:
 
     def deserializeClassifier(self):
         model = None
+        classifier = None
+        with open(self.vectorizer_path, 'rb') as fid:
+            classifier = cPickle.load(fid)
+        self.vectorizer = classifier
+
         with open(self.dumped_classifier_path, 'rb') as fid:
             model = cPickle.load(fid)
         return model

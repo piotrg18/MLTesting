@@ -1,14 +1,14 @@
 from nlpModel import NlpClassifier
 
 classifier = NlpClassifier(3)
-classifier.createKMeans()
-classifier.createnlpClassifier()
+#classifier.createKMeans()
+#classifier.createnlpClassifier()
 
-classifier.assignDocsToCluster()
+#classifier.assignDocsToCluster()
 
-'''
-classifier.serializeKMeans()
-classifier.serializeClassifier()
+
+#classifier.serializeKMeans()
+#classifier.serializeClassifier()
 
 
 testArticle = ""
@@ -17,4 +17,3 @@ with open('data\\test_article.txt', 'r') as myfile:
 
 
 classifier.predict(testArticle)
-'''
