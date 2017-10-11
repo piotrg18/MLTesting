@@ -72,6 +72,8 @@ km.fit(X)
 
 text = {}
 
+print(km.labels_[4])
+
 for i,cluster in enumerate(km.labels_):
     oneDoc = tmpPosts[i]
     if cluster not in text.keys():
@@ -79,7 +81,7 @@ for i,cluster in enumerate(km.labels_):
     else:
         text[cluster] += oneDoc
 
-
+'''
 _stopwords = set(stopwords.words('english') + list(punctuation) + ["billion","year","y/y","b\\","","millions","’s","’’","mr."])
 
 keywords=  {}
@@ -119,3 +121,4 @@ with open('my_dumped_classifier.pkl', 'rb') as fid:
 
 
 print(model.predict(test))
+'''
