@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 plt.style.use('fivethirtyeight')
 
-df = pd.read_csv('AirPassengers.csv')
+df = pd.read_csv('Stock.csv')
 df.head(5)
 
 
@@ -16,14 +16,14 @@ print(df.head(5))
 print(df.dtypes)
 
 
-df = df.rename(columns={'Month': 'ds',
-                        'AirPassengers': 'y'})
+df = df.rename(columns={'Days': 'ds',
+                        'Values': 'y'})
 
 df.head(5)
 
 def plotSampleDate(data):
     ax = df.set_index('ds').plot(figsize=(12, 8))
-    ax.set_ylabel('Monthly Number of Airline Passengers') 
+    ax.set_ylabel('Stock Values') 
     ax.set_xlabel('Date')
     plt.show()
 
@@ -33,7 +33,7 @@ def plotSampleDate(data):
 my_model = Prophet(interval_width=0.01)
 my_model.fit(df)
 
-future_dates = my_model.make_future_dataframe(periods=200, freq='MS')
+future_dates = my_model.make_future_dataframe(periods=35, freq='MS')
 print (future_dates.tail())
 
 forecast = my_model.predict(future_dates)
@@ -41,7 +41,7 @@ forecast = my_model.predict(future_dates)
 #forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail()
 
 my_model.plot(forecast,
-              uncertainty=True)
+              uncertainty=False)
 
 #my_model.plot_components(forecast)
 plt.show()
