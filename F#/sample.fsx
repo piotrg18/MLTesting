@@ -65,8 +65,8 @@ let alcoholFeature = learningData |> Seq.map (fun x -> x.Alcohol)
 let qualityLabels = learningData |> Seq.map (fun x -> x.``Residual sugar``)
 
 
-let sampleA = -0.1 
-let sampleB = -0.1
+let sampleA = -2.1
+let sampleB = 30.0
 let hypothesis = predictionModel sampleA sampleB alcoholFeature
 
 costFunction hypothesis qualityLabels
