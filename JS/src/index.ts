@@ -1,21 +1,23 @@
 import * as tf from '@tensorflow/tfjs';
+import {Player}  from './player';
 declare var p5: any;
+let player  :Player; 
 
-console.log("dsdsa");
+
 var sketch = (p) => {
   p.preload = () => {
+    
   };
   p.setup = () => {
-      p.createCanvas(600,400);
-      p.frameRate(10);
+      p.createCanvas(640,480);
+      p.frameRate(5);
+      player = new Player(p.width);
   };
 
-  p.update = () => {
-      console.log("update")
-  };
   p.draw = () => {
-      p.background(30);
+      p.background(100);
       console.log("draw");
+      //player.show();
   };
 };
 var sketchP = new p5(sketch);
