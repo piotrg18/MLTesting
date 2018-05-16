@@ -3,10 +3,10 @@ package-lock.json
 npm-debug.log
 .DS_Store
 dist/
+build/
 tensorflow-tfjs-*.tgz
 yarn-error.log
 .yalc/
 yalc.lock
-*.js
 *.map
 .vscode/

@@ -1,5 +1,6 @@
-import * as tf from '@tensorflow/tfjs';
 import {Player}  from './player';
+import * as tf from '@tensorflow/tfjs';
+
 declare var p5: any;
 let player  :Player; 
 
@@ -11,19 +12,19 @@ var sketch = (p) => {
   p.setup = () => {
       p.createCanvas(640,480);
       p.frameRate(5);
-      player = new Player(p.width);
+      //player = new Player(p.width);
+      console.log("Dummy");
   };
 
   p.draw = () => {
       p.background(100);
-      console.log("draw");
+
       //player.show();
   };
 };
 var sketchP = new p5(sketch);
-console.log("dasdas")
+console.log("Dummy");
 
-  
     // Define a model for linear regression.
 const model = tf.sequential();
 model.add(tf.layers.dense({units: 1, inputShape: [1]}));
@@ -37,13 +38,9 @@ console.log("Data sdadas");
 const xs = tf.tensor2d([1, 2, 3, 4], [4, 1]);
 const ys = tf.tensor2d([1, 3, 5, 7], [4, 1]);
 
-console.log("dasa");
+console.log("End");
 
-// Train the model using the data.
-model.fit(xs, ys).then(() => {
-  // Use the model to do inference on a data point the model hasn't seen before:
-  (model.predict(tf.tensor2d([5], [1, 1])) as tf.Tensor).print();
-});
+
   
 
 
