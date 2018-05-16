@@ -11,15 +11,23 @@ var sketch = (p) => {
   };
   p.setup = () => {
       p.createCanvas(640,480);
-      p.frameRate(5);
-      //player = new Player(p.width);
-      console.log("Dummy");
+      p.frameRate(20);
+      player = new Player(p.height);
+      //console.log("Dummy");
   };
 
   p.draw = () => {
       p.background(100);
-
+      player.update(p.height);
+      player.draw(p);
       //player.show();
+  };
+
+  p.keyPressed = () => {
+    if (p.key == ' ') {
+        player.move();
+        //console.log("SPACE");
+      }
   };
 };
 var sketchP = new p5(sketch);
