@@ -1,6 +1,6 @@
 export class Player {
-    _x:number;
-    _y:number;
+    private _x:number;
+    private _y:number;
 
     gravity:number = 0.7;
     lift:number = -12;
@@ -12,11 +12,20 @@ export class Player {
     draw(p5:any) :void {
         p5.fill(255);
         p5.ellipse(this._x, this._y, 32, 32);
+     
         //let d = random(4);
     }
     move(): void {
         this.velocity += this.lift;
     }
+    getX():number{
+        return this._x;
+    }
+    
+    getY():number{
+        return this._y;
+    }
+
     update(height:number): void 
     {
         this.velocity += this.gravity;

@@ -1,25 +1,27 @@
 import {Player}  from './player';
+import {Obstacle} from "./obstacle"
+import {Game} from "./Game"
 import * as tf from '@tensorflow/tfjs';
 
 declare var p5: any;
 let player  :Player; 
-
+let game: Game;
 
 var sketch = (p) => {
   p.preload = () => {
-    
+    player = new Player(p.height);
+    game = new Game(p.height, p.width, p.random);
   };
   p.setup = () => {
       p.createCanvas(640,480);
-      p.frameRate(20);
-      player = new Player(p.height);
+      p.frameRate(60);
+      
       //console.log("Dummy");
   };
 
   p.draw = () => {
       p.background(100);
-      player.update(p.height);
-      player.draw(p);
+      game.draw(p, player);
       //player.show();
   };
 
