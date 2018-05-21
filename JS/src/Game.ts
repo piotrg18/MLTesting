@@ -30,4 +30,17 @@ export class Game {
         }
         
     }
+    normalizeScore(players:Array<Player>):Array<Player>{
+        for (let i = 0; i < players.length; i++) {
+            players[i].score = Math.pow(players[i].score, 2);
+        }
+        
+        let allScores = players.map((a) => a.score);
+        let maxScore = allScores.reduce((acc,current)=> {
+            return acc + current;
+        });
+
+        let tmpPlayers =  players.map((p) => {p.fitness = (p.fitness / maxScore);return p;} );
+        return tmpPlayers;
+    }
 }

@@ -1,4 +1,6 @@
 export class Player {
+    fitness: number;
+    score: number;
     private _x:number;
     private _y:number;
 
@@ -8,12 +10,14 @@ export class Player {
     constructor(size:number){
         this._x = 64;
         this._y = size / 2;
+        this.score = 0;
+        // Fitness is normalized version of score
+        this.fitness = 0;
     }
     draw(p5:any) :void {
         p5.fill(255);
         p5.ellipse(this._x, this._y, 32, 32);
      
-        //let d = random(4);
     }
     move(): void {
         this.velocity += this.lift;
@@ -40,6 +44,7 @@ export class Player {
             this._y = 0;
             this.velocity = 0;
         }
+        this.score++;
 
     }
 

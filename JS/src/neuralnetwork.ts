@@ -6,6 +6,7 @@ export class NeuralNetwork {
     
     model:Sequential;
 
+  
     constructor(){
         this.model = tf.sequential();
         
@@ -15,7 +16,7 @@ export class NeuralNetwork {
         this.model.add(tf.layers.dense({ units: 2, name: 'outputLayer', useBias:true, biasInitializer:initializer , activation: 'sigmoid' }) );    
         this.model.compile({optimizer: 'sgd', loss: 'binaryCrossentropy'})
         
-        let xs = tf.tensor([[0.44,0.98,0.5,0.6,0.8]]);
+        
         
         // this.model.layers[0].getWeights()[0].print();
         // this.model.layers[0].getWeights()[1].print();
@@ -48,7 +49,21 @@ export class NeuralNetwork {
         this.model.layers[0].getWeights()[1].print();
         this.model.layers[1].getWeights()[1].print();
         
+        
     }
+
+    copy() : NeuralNetwork{
+        let copy = new NeuralNetwork();
+        copy.model.layers[0].setWeights(this.model.layers[0].getWeights());
+        copy.model.layers[1].setWeights(this.model.layers[1].getWeights());
+        
+        copy.model.layers[0].getWeights()[0].print();
+        copy.model.layers[0].getWeights()[1].print();
+        copy.model.layers[1].getWeights()[0].print();
+        copy.model.layers[1].getWeights()[1].print();
+        return copy;
+    }
+
     private mutateInternal(original:Float32Array, randomFunc: (max: number) => number, randomGuassian: () => number) :Float32Array {
         let tmp = original.map(element => {
             if(randomFunc(1)< 0.1){
@@ -61,6 +76,12 @@ export class NeuralNetwork {
             }
         });
         return tmp;
+    }
+
+    predict():void {
+        let xs = tf.tensor([[0.44,0.98,0.5,0.6,0.8]]);
+        console.table((this.model.predict(xs) as tf.Tensor).dataSync());
+        console.table((this.model.predict(xs) as tf.Tensor).dataSync());
     }
 
 }
