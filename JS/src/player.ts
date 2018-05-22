@@ -9,7 +9,7 @@ export class Player {
     private _x:number;
     private _y:number;
     r:number = 16;
-    gravity:number = 0.7;
+    gravity:number = 0.8;
     lift:number = -12;
     velocity:number = 0;
 
@@ -28,13 +28,13 @@ export class Player {
      
     }
 
-    newNeurualNetwork():void{
-        this.nn = new NeuralNetwork();
+    newNeurualNetwork(p5:any):void{
+        this.nn = new NeuralNetwork(p5);
     }
 
-    copy(size:number):Player{
+    copy(size:number, p5:any):Player{
         let p = new Player(size);
-        p.nn = this.nn.copy();
+        p.nn = this.nn.copy(p5);
         return p;
     }
     
@@ -89,7 +89,7 @@ export class Player {
             // Get the outputs from the network
             let action = this.nn.predict(inputs);
             // Decide to jump or not!
-            if (action[1] > action[0]) {
+            if (action[0] > 0.5) {
                 this.move();
             }
         }

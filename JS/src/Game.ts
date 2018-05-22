@@ -7,19 +7,20 @@ export class Game {
     pipes:Array<Obstacle>;
     allPlayers:Array<Player>;
     activePlayers:Array<Player>;
-    population:number = 500;
+    population:number = 200;
     constructor(height:number, width:number, p5:any){
         this.pipes = new Array();
         this.activePlayers = new Array<Player>();
         this.allPlayers = new Array<Player>();
         this.p5 = p5;
         this.initPopulation(height);    
+        this.pipes.push(new Obstacle(p5.height,p5.width, p5.random));
     }
 
     private initPopulation(height: number):void{
         for(let  i = 0 ; i < this.population ; i++){
             let player = new Player(height);
-            player.newNeurualNetwork();
+            player.newNeurualNetwork(this.p5);
             this.allPlayers[i] = player;
             this.activePlayers[i] = player;
         }
@@ -28,6 +29,7 @@ export class Game {
     resetGame():void{
         this.counter = 0;
         this.pipes = [];
+        this.pipes.push(new Obstacle(this.p5.height,this.p5.width, this.p5.random));
     }
     generate(players: Array<Player>): any {
         let newPlayers = [];
@@ -35,8 +37,8 @@ export class Game {
             // Select a player based on score
             let player = this.poolSelection(players, this.p5.height);
             //mutation
-            player.nn.mutate(this.p5.random, this.p5.randomGaussian);
-            newPlayers[i] = players;
+            player.nn.mutate();
+            newPlayers[i] = player;
         }
         return newPlayers;
     }
@@ -47,7 +49,7 @@ export class Game {
         this.allPlayers = this.activePlayers.slice();
     }
 
-    draw(p5:any, player:Player):void{
+    draw(p5:any):void{
         for (let i = this.pipes.length - 1; i >= 0; i--) {
             this.pipes[i].update();
             if (this.pipes[i].offscreen()) {
@@ -80,8 +82,6 @@ export class Game {
             this.nextGeneration();
         }
         
-
-        
     }
     normalizeScore(players:Array<Player>):Array<Player>{
         for (let i = 0; i < players.length; i++) {
@@ -93,8 +93,11 @@ export class Game {
             return acc + current;
         });
 
-        let tmpPlayers =  players.map((p) => {p.fitness = (p.fitness / maxScore);return p;} );
-        return tmpPlayers;
+        for(let i = 0 ; i < players.length; i ++){
+            players[i].fitness = players[i].score / maxScore;
+        }
+        
+        return players;
     }
     poolSelection(players:Array<Player>, height:number):Player{
         let index = 0;
@@ -105,7 +108,7 @@ export class Game {
             index += 1;
         }
         index -= 1;
-        return players[index].copy(height);
+        return players[index].copy(height, this.p5);
     }
 
 }
