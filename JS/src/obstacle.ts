@@ -5,13 +5,14 @@ export class Obstacle {
     private w:number = 80;
     private speed:number;
     private bottom:number;
-    private x:number;
+    x:number;
     private top:number;
     private highlight:boolean;
     
     constructor(height:number, width:number, randomFunc: (start: number, stop: number) => number){
-        this.top = randomFunc(height / 6, 3 / 4 * height);
-        this.bottom = height - (this.top + this.spacing);
+        let centery = randomFunc(this.spacing, height - this.spacing);
+        this.top = centery - this.spacing / 2;
+        this.bottom = height - (centery + this.spacing / 2);
         this.x = width;
         this.w = 80;
         this.speed = 6;
@@ -29,16 +30,12 @@ export class Obstacle {
     
 
     hits(player: Player, height:number):boolean {
-        let x = player.getX();
-        let y = player.getY();
-        if (y < this.top || y > height - this.bottom) {
-            if (x > this.x && x < this.x + this.w) {
-              this.highlight = true;
+        if ((player.getY() - player.r) < this.top || (player.getY() + player.r) > (height - this.bottom)) {
+            if (player.getX() > this.x && player.getX() < this.x + this.w) {
               return true;
             }
-        }
-        this.highlight = false;
-        return false;
+          }
+          return false;
     }
 
     update(): void {

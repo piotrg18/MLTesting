@@ -17,15 +17,6 @@ export class NeuralNetwork {
         this.model.compile({optimizer: 'sgd', loss: 'binaryCrossentropy'})
         
         
-        
-        // this.model.layers[0].getWeights()[0].print();
-        // this.model.layers[0].getWeights()[1].print();
-
-        // this.model.layers[1].getWeights()[0].print();
-        // this.model.layers[1].getWeights()[1].print();
-
-
-        // console.table((this.model.predict(xs) as tf.Tensor).dataSync());
     }
     mutate(randomFunc: (max: number) => number, randomGuassian: () => number) :void{
         this.model.layers[0].getWeights()[0].print();
@@ -43,24 +34,13 @@ export class NeuralNetwork {
         let changedW2 = this.mutateInternal(W2, randomFunc, randomGuassian);
         let changedB2 = this.mutateInternal(B2, randomFunc, randomGuassian);
 
-        this.model.layers[1].setWeights([tf.tensor(changedW2, [8,2]),tf.tensor(changedB2)]);
-        
-        this.model.layers[0].getWeights()[0].print();
-        this.model.layers[0].getWeights()[1].print();
-        this.model.layers[1].getWeights()[1].print();
-        
-        
+        this.model.layers[1].setWeights([tf.tensor(changedW2, [8,2]),tf.tensor(changedB2)]);      
     }
 
     copy() : NeuralNetwork{
         let copy = new NeuralNetwork();
         copy.model.layers[0].setWeights(this.model.layers[0].getWeights());
         copy.model.layers[1].setWeights(this.model.layers[1].getWeights());
-        
-        copy.model.layers[0].getWeights()[0].print();
-        copy.model.layers[0].getWeights()[1].print();
-        copy.model.layers[1].getWeights()[0].print();
-        copy.model.layers[1].getWeights()[1].print();
         return copy;
     }
 
@@ -78,10 +58,9 @@ export class NeuralNetwork {
         return tmp;
     }
 
-    predict():void {
-        let xs = tf.tensor([[0.44,0.98,0.5,0.6,0.8]]);
-        console.table((this.model.predict(xs) as tf.Tensor).dataSync());
-        console.table((this.model.predict(xs) as tf.Tensor).dataSync());
+    predict(inputs:Array<number>):Float32Array {
+        let xs = tf.tensor([inputs]);
+        return ((this.model.predict(xs) as tf.Tensor).dataSync() as Float32Array);
     }
 
 }

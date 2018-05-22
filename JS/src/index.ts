@@ -46,7 +46,8 @@ let game: Game;
 
 let d = new NeuralNetwork();
 d.mutate((num) => 0.01, () => 2);
-d.predict();
+let t = d.predict([0.44,0.98,0.5,0.6,0.8]);
+
 let copied = d.copy();
 // model.add(tf.layers.dense({ units: 8 , name: 'hiddenLayer',biasInitializer :'randomUniform',  activation: 'sigmoid' , inputShape: [5] }) );  
 // model.add(tf.layers.dense({ units: 2, name: 'outputLayer', activation: 'sigmoid' }) );    
