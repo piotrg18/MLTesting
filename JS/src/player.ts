@@ -1,9 +1,11 @@
 import { NeuralNetwork } from "./neuralnetwork";
 import { Obstacle } from "./obstacle";
+import { INeuralNetwork } from "./INeuralNetwork";
+import { CustomNeuralNetwork } from "./CustomNeuralNetwork";
 
 export class Player {
     size: number;
-    nn: NeuralNetwork;
+    nn: INeuralNetwork;
     fitness: number;
     score: number;
     private _x:number;
@@ -28,13 +30,13 @@ export class Player {
      
     }
 
-    newNeurualNetwork(p5:any):void{
-        this.nn = new NeuralNetwork(p5);
+    newNeurualNetwork():void{
+        this.nn = new CustomNeuralNetwork(5,8,2);
     }
 
     copy(size:number, p5:any):Player{
         let p = new Player(size);
-        p.nn = this.nn.copy(p5);
+        p.nn = this.nn.copy();
         return p;
     }
     

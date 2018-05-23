@@ -1,7 +1,9 @@
 import { Obstacle } from "./obstacle";
 import { Player } from "./player";
+import { Random } from "./Random";
 
 export class Game {
+    randomHelper: Random;
     p5: any;
     counter: number;
     pipes:Array<Obstacle>;
@@ -13,6 +15,7 @@ export class Game {
         this.activePlayers = new Array<Player>();
         this.allPlayers = new Array<Player>();
         this.p5 = p5;
+        this.randomHelper = new Random();
         this.initPopulation(height);    
         this.pipes.push(new Obstacle(p5.height,p5.width, p5.random));
     }
@@ -20,7 +23,7 @@ export class Game {
     private initPopulation(height: number):void{
         for(let  i = 0 ; i < this.population ; i++){
             let player = new Player(height);
-            player.newNeurualNetwork(this.p5);
+            player.newNeurualNetwork();
             this.allPlayers[i] = player;
             this.activePlayers[i] = player;
         }
@@ -33,11 +36,22 @@ export class Game {
     }
     generate(players: Array<Player>): any {
         let newPlayers = [];
+        let randomHelper = this.randomHelper;
+        let  mutateInternal=  (x) => {
+            if (randomHelper.random(1) < 0.1) {
+              let offset = randomHelper.randomGaussian() * 0.5;
+              let newx = x + offset;
+              return newx;
+            } else {
+              return x;
+            }
+        }
+
         for (let i = 0; i < players.length; i++) {
             // Select a player based on score
             let player = this.poolSelection(players, this.p5.height);
             //mutation
-            player.nn.mutate();
+            player.nn.mutate(mutateInternal);
             newPlayers[i] = player;
         }
         return newPlayers;
