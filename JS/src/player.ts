@@ -4,6 +4,9 @@ import { INeuralNetwork } from "./INeuralNetwork";
 import { CustomNeuralNetwork } from "./CustomNeuralNetwork";
 
 export class Player {
+    
+    width: number;
+    height: number;
     size: number;
     nn: INeuralNetwork;
     fitness: number;
@@ -11,27 +14,28 @@ export class Player {
     private _x:number;
     private _y:number;
     r:number = 16;
-    gravity:number = 0.8;
-    lift:number = -12;
-    velocity:number = 0;
 
 
-    constructor(size:number){
-        this._x = 64;
+    constructor(size:number ){
+        this._x = size / 2;
         this.size = size;
-        this._y = size / 2;
+        
         this.score = 0;
         this.fitness = 0;
+        this.height = this.r*4;
+        this.width = this.r;
+        this._y = size - this.height -2;
     }
 
     draw(p5:any) :void {
         p5.fill(255);
-        p5.ellipse(this._x, this._y, this.r*2, this.r*2);
+
+        p5.rect(this._x, this._y, this.width, this.height);
      
     }
 
     newNeurualNetwork():void{
-        this.nn = new CustomNeuralNetwork(5,16,2);
+        this.nn = new CustomNeuralNetwork(5,8,2);
     }
 
     copy(size:number, p5:any):Player{
@@ -41,12 +45,12 @@ export class Player {
     }
     
     move(): void {
-        this.velocity += this.lift;
+       // this.velocity += this.lift;
     }
 
     
-    bottomTop(): Boolean {
-        return (this._y > this.size || this._y < 0);
+    hitLeftOrRight(width): Boolean {
+        return ((this._x + this.width) > width || this._x < 0);
     }
 
     getX():number{
@@ -61,47 +65,59 @@ export class Player {
         return ((n-start1)/(stop1-start1))*(stop2-start2)+start2;
     }
 
-    think(obstacles:Array<Obstacle>){
+    think(obstacles:Array<Obstacle>,height:number ,width :number){
         let record = Infinity;
         let closest  = null;
         //to change and replace with reduce
         obstacles.forEach(o => { 
-            let diff = o.x - this._x;
+            let diff = this._y - o.y;
             if (diff > 0 && diff < record) {
               record = diff;
               closest = o;
             }
         });
-        let height = 480;
-        let width = 640;
         if (closest != null) {
+            //console.log("near");
             // Now create the inputs to the neural network
             let inputs = [];
             // x position of closest pipe
-            inputs[0] = this.map(closest.x, this._x, width, 0, 1);
+            inputs[0] = this.map(closest.y + closest.w, this._y, height, 0, 1);
             // top of closest pipe opening
-            inputs[1] = this.map(closest.top, 0, height, 0, 1);
+            inputs[1] = this.map(closest.left, 0, width, 0, 1);
             // bottom of closest pipe opening
-            inputs[2] = this.map(closest.bottom, 0, height, 0, 1);
+            inputs[2] = this.map(closest.right ,0, width, 0, 1);
             // bird's y position
-            inputs[3] = this.map(this._y, 0, height, 0, 1);
+            //inputs[2] = this.map(this._y, 0, height, 0, 1);
             // bird's y velocity
-            inputs[4] = this.map(this.velocity, -5, 5, 0, 1);
+            inputs[3] = this.map(this._x, 0, width, 0, 1);
+            inputs[4] = this.map(this._x + this.width,this._x, width, 0, 1);
         
             // Get the outputs from the network
             let action = this.nn.predict(inputs);
             // Decide to jump or not!
             if (action[0] > 0.5) {
-                this.move();
+                //console.log("turn left");
+                this.moveLeft();
+            }
+            else if (action[1] > 0.6){
+                //console.log("turn rigtht");
+                this.moveRight();
             }
         }
 
     }
 
+    moveRight(): any {
+        this._x +=1;
+    }
+    moveLeft(): any {
+        this._x -=1;
+    }
+
     update(height:number): void 
     {
-        this.velocity += this.gravity;
-        this._y += this.velocity;
+        //this.velocity += this.gravity;
+        //this._y -= 0.8;
 
         this.score++;
 

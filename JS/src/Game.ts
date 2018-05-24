@@ -32,7 +32,7 @@ export class Game {
     resetGame():void{
         this.counter = 0;
         this.pipes = [];
-        this.pipes.push(new Obstacle(this.p5.height,this.p5.width, this.p5.random));
+        //this.pipes.push(new Obstacle(this.p5.height,this.p5.width, this.p5.random));
     }
     generate(players: Array<Player>): any {
         let newPlayers = [];
@@ -72,27 +72,31 @@ export class Game {
         }
         for (let i = this.activePlayers.length - 1; i >= 0; i--) {
             let player = this.activePlayers[i];
-            player.think(this.pipes);
+            player.think(this.pipes,p5.height, p5.width);
             player.update(p5.height);
             for (let j = 0; j < this.pipes.length; j++) {
-                if(this.pipes[j].hits(this.activePlayers[i], p5.height)) {
+                if(this.pipes[j].hits(this.activePlayers[i], p5.width)) {
                     this.activePlayers.splice(i, 1);
                     break;
                 }
             }
-            if (player.bottomTop()) {
+            if (player.hitLeftOrRight(p5.width)) {
                 this.activePlayers.splice(i, 1);
             }
         }    
         if (p5.frameCount % 75 == 0) {
-            this.pipes.push(new Obstacle(p5.height,p5.width, p5.random));
+            //console.log("add pipe");
+           //if(this.pipes.length != 1 ){
+                this.pipes.push(new Obstacle(p5.height,p5.width, p5.random));
+            //}
         }
 
-        this.pipes.forEach((p) => {p.show(p5, p5.height);});
+        this.pipes.forEach((p) => {p.show(p5);});
 
         this.activePlayers.forEach((p) => {p.draw(p5);});
           // If we're out of birds go to the next generation
         if (this.activePlayers.length == 0) {
+            //console.log("newGen");
             this.nextGeneration();
         }
         
