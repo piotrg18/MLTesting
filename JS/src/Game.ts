@@ -9,7 +9,7 @@ export class Game {
     pipes:Array<Obstacle>;
     allPlayers:Array<Player>;
     activePlayers:Array<Player>;
-    population:number = 200;
+    population:number = 500;
     constructor(height:number, width:number, p5:any){
         this.pipes = new Array();
         this.activePlayers = new Array<Player>();

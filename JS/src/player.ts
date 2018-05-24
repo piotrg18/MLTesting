@@ -31,7 +31,7 @@ export class Player {
     }
 
     newNeurualNetwork():void{
-        this.nn = new CustomNeuralNetwork(5,16,2);
+        this.nn = new CustomNeuralNetwork(5,8,2);
     }
 
     copy(size:number, p5:any):Player{
@@ -91,7 +91,7 @@ export class Player {
             // Get the outputs from the network
             let action = this.nn.predict(inputs);
             // Decide to jump or not!
-            if (action[0] > 0.5) {
+            if (action[0] > action[1]) {
                 this.move();
             }
         }
