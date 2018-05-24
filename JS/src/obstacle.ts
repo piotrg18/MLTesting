@@ -1,7 +1,7 @@
 import { Player } from "./player";
 
 export class Obstacle {
-    private spacing:number = 175;
+    private spacing:number = 145;
     private w:number = 80;
     private speed:number;
     private bottom:number;

@@ -31,7 +31,7 @@ export class Player {
     }
 
     newNeurualNetwork():void{
-        this.nn = new CustomNeuralNetwork(5,8,2);
+        this.nn = new CustomNeuralNetwork(5,16,2);
     }
 
     copy(size:number, p5:any):Player{
