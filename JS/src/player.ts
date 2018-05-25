@@ -83,9 +83,9 @@ export class Player {
             // x position of closest pipe
             inputs[0] = this.map(closest.y + closest.w, this._y, height, 0, 1);
             // top of closest pipe opening
-            inputs[1] = this.map(closest.left, 0, width, 0, 1);
+            inputs[1] = this.map(closest.left + closest.w, closest.left, width, 0, 1);
             // bottom of closest pipe opening
-            inputs[2] = this.map(closest.right ,0, width, 0, 1);
+            inputs[2] = this.map(closest.right+ closest.w ,closest.right, width, 0, 1);
             // bird's y position
             //inputs[2] = this.map(this._y, 0, height, 0, 1);
             // bird's y velocity
@@ -95,11 +95,11 @@ export class Player {
             // Get the outputs from the network
             let action = this.nn.predict(inputs);
             // Decide to jump or not!
-            if (action[0] > 0.5) {
+            if (action[1] > action[0]) {
                 //console.log("turn left");
                 this.moveLeft();
             }
-            else if (action[1] > 0.6){
+            else {
                 //console.log("turn rigtht");
                 this.moveRight();
             }
@@ -108,10 +108,10 @@ export class Player {
     }
 
     moveRight(): any {
-        this._x +=1;
+        this._x +=2;
     }
     moveLeft(): any {
-        this._x -=1;
+        this._x -=2;
     }
 
     update(height:number): void 

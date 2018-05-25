@@ -34,9 +34,9 @@ export class Game {
         this.pipes = [];
         //this.pipes.push(new Obstacle(this.p5.height,this.p5.width, this.p5.random));
     }
-    generate(players: Array<Player>): any {
+    generate(players: Array<Player>,p5): any {
         let newPlayers = [];
-        let randomHelper = this.randomHelper;
+        let randomHelper = p5;
         let  mutateInternal=  (x) => {
             if (randomHelper.random(1) < 0.1) {
               let offset = randomHelper.randomGaussian() * 0.5;
@@ -56,10 +56,10 @@ export class Game {
         }
         return newPlayers;
     }
-    nextGeneration():void{
+    nextGeneration(p5:any):void{
         this.resetGame();
         this.allPlayers = this.normalizeScore(this.allPlayers);
-        this.activePlayers = this.generate(this.allPlayers);
+        this.activePlayers = this.generate(this.allPlayers,p5);
         this.allPlayers = this.activePlayers.slice();
     }
 
@@ -97,7 +97,7 @@ export class Game {
           // If we're out of birds go to the next generation
         if (this.activePlayers.length == 0) {
             //console.log("newGen");
-            this.nextGeneration();
+            this.nextGeneration(p5);
         }
         
     }
