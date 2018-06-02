@@ -1,5 +1,5 @@
 const path = require('path')
-
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
   entry: {
     main: './src/'
@@ -12,6 +12,12 @@ module.exports = {
   resolve: {
     extensions: [".js", ".tsx", ".ts", ".json", ".html"]
   },
+  plugins:[
+    new CopyWebpackPlugin([
+      {from:'public/img',to:'public'} ,
+      {from:'public/levels',to:'public'} 
+    ]) 
+  ],
   module: {
     rules: [
         { test: /\.ts$/, loader: "awesome-typescript-loader" },
