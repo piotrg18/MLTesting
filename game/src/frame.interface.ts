@@ -1,4 +1,5 @@
-export interface IFrameData {
-  frameStartTime: number;
-  deltaTime: number;
+
+export class FrameData{
+  constructor(public frameStartTime:number, public deltaTime:number){
+  }
 }
