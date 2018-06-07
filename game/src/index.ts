@@ -4,7 +4,7 @@ import { buffer, bufferCount,expand, filter, map,  share, tap, withLatestFrom,ti
 import { fromPromise } from "rxjs/internal-compatibility";
 import {loadImage,loadLevel} from "./loaders";
 import { frames$, keysDownPerFrame$ } from "./Utils";
-import { InitialData } from "./InitialData";
+import { Compositor } from "./InitialData";
 
 
 
@@ -13,10 +13,14 @@ var dom = {};
 
 
 let imageObservable =  from(loadImage("public/img/tiles.png"));
+let marioObservable =  from(loadImage("public/img/characters.gif"));
 let levelLoaders =  from(loadLevel("public/1-1.json"));
-let initData = imageObservable.pipe(
-            withLatestFrom(levelLoaders),
-            map(([image,level]) =>  { return new InitialData(image,level)}));
+
+
+
+let loadedFiles =  forkJoin(imageObservable,levelLoaders,marioObservable)
+                                    .pipe( 
+                                        map(([image,level,marioImage]) =>  { return new Compositor(image,level,marioImage)}));
 
 const gameArea: HTMLElement= document.getElementById('screen');
 
@@ -34,27 +38,34 @@ function drawBackground(background, context, sprites) {
 } 
 
 const update = (deltaTime: number, state: any, inputData: any): any => {
-    //console.log("update");
+  
+    let mario = state["mario"] ;
+    mario.x += 1;
+    mario.y += 1;
+    state['mario'] = mario;
+
 
    // console.log(initData);
+   return state;
 };
 
 
 
-const render = (state: any, initData:InitialData) => {
-   // console.log("render");
-    initData.levels.backgrounds.forEach(bg => {
-        drawBackground(bg, context,initData.sprites);
-    }); 
+const render = (state: any, initData:Compositor) => {
 
-
+    initData.draw(context, initMario['mario']);
+    
 }
 
-const gameState$ = new BehaviorSubject({});
+let initMario =  {};
+initMario['mario'] = {x: 64,y: 64};
+
+const gameState$ = new BehaviorSubject(initMario);
 
 
-initData.subscribe((initData) =>
+loadedFiles.subscribe((initData) =>
  {
+
     frames$.pipe(
         withLatestFrom(gameState$),
         map(([deltaTime,gameState]) => update(deltaTime,gameState, undefined)),

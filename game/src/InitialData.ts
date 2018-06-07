@@ -1,12 +1,38 @@
 import SpriteSheet from "./SpriteSheet";
+import { createBackgroundLayer } from "./layersUtils";
 
-export class InitialData{
-    sprites: SpriteSheet;
+function createSpriteLayer(sprite, pos) {
+    return function drawSpriteLayer(context) {
+        sprite.draw('idle', context, pos.x, pos.y);
+    };
+}
+
+export class Compositor{
+    layers: any[];
+    backgroudsprites: SpriteSheet;
+    marioSprite :SpriteSheet;
     levels: any;
-    constructor(image:any,levels:any){
+    constructor(image:any,levels:any, marioImage:any){
         this.levels = levels;
-        this.sprites = new SpriteSheet(image);
-        this.sprites.define('ground', 0, 0);
-        this.sprites.define('sky', 3, 23);
+        this.backgroudsprites = new SpriteSheet(image, 16, 16);
+        this.backgroudsprites.defineTile('ground', 0, 0);
+        this.backgroudsprites.defineTile('sky', 3, 23);
+        this.marioSprite = new SpriteSheet(marioImage,16,16);
+        this.marioSprite.define('idle', 276, 44, 16, 16);
+
+        this.layers = [];
     }
+    draw(context,mario:any) {
+        
+        if(this.layers.length === 0){
+            this.initLayers(mario)
+        }
+        this.layers.forEach(layer => {
+            layer(context);
+        });
+    }
+    initLayers(pos){
+        this.layers.push(createBackgroundLayer(this.levels.backgrounds, this.backgroudsprites));
+        this.layers.push(createSpriteLayer(this.marioSprite, pos));
+    } 
 }
