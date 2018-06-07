@@ -1,5 +1,6 @@
 import SpriteSheet from "./SpriteSheet";
 import { createBackgroundLayer } from "./layersUtils";
+import { Entity } from "./Entity";
 
 function createSpriteLayer(sprite, pos) {
     return function drawSpriteLayer(context) {
@@ -22,10 +23,10 @@ export class Compositor{
 
         this.layers = [];
     }
-    draw(context,mario:any) {
+    draw(context,mario:Entity) {
         
         if(this.layers.length === 0){
-            this.initLayers(mario)
+            this.initLayers(mario.pos)
         }
         this.layers.forEach(layer => {
             layer(context);

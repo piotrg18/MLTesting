@@ -5,6 +5,8 @@ import { fromPromise } from "rxjs/internal-compatibility";
 import {loadImage,loadLevel} from "./loaders";
 import { frames$, keysDownPerFrame$ } from "./Utils";
 import { Compositor } from "./InitialData";
+import { Vector } from "./Vector";
+import { Entity } from "./Entity";
 
 
 
@@ -26,22 +28,15 @@ const gameArea: HTMLElement= document.getElementById('screen');
 
 const context = (gameArea as HTMLCanvasElement).getContext('2d');
 
+const gravity = 0.5;
 
-function drawBackground(background, context, sprites) {
-    background.ranges.forEach(([x1, x2, y1, y2]) => {
-        for (let x = x1; x < x2; ++x) {
-            for (let y = y1; y < y2; ++y) {
-                sprites.drawTile(background.tile, context, x, y);
-            }
-        }
-    });
-} 
 
-const update = (deltaTime: number, state: any, inputData: any): any => {
+const update = (deltaTime: number, state: Entity, inputData: any): any => {
   
     let mario = state["mario"] ;
-    mario.x += 1;
-    mario.y += 1;
+    mario.pos.x += mario.vel.x;
+    mario.pos.y += mario.vel.y;
+    mario.vel.y += gravity;
     state['mario'] = mario;
 
 
@@ -57,10 +52,12 @@ const render = (state: any, initData:Compositor) => {
     
 }
 
-let initMario =  {};
-initMario['mario'] = {x: 64,y: 64};
+let initMario =  new Entity();
+initMario.pos.set(64,180);
+initMario.vel.set(2,-10);
+initMario['mario'] = initMario;
 
-const gameState$ = new BehaviorSubject(initMario);
+const gameState$ = new BehaviorSubject<Entity>(initMario);
 
 
 loadedFiles.subscribe((initData) =>
