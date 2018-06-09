@@ -1,6 +1,7 @@
-import { Observable,of, BehaviorSubject} from "rxjs";
+import { Observable,of, BehaviorSubject, fromEvent} from "rxjs";
 import { FrameData } from "./frame.interface";
 import { buffer, bufferCount,expand, filter, map,  share, tap, withLatestFrom,timestamp} from 'rxjs/operators';
+import { KeyUtil } from "./keyUtils";
 
 export const clampTo30FPS = (frame: FrameData) => {
     if(frame.deltaTime > (1/30)) {
@@ -32,8 +33,21 @@ export const calculateStep: (prevFrame: FrameData) => Observable<FrameData> = (p
     share()
   );
 
-  const keysDown$ = of(undefined)
-  .pipe(filter ((keyMap) => keyMap !== undefined));
+  const keysDown$ = fromEvent(document, 'keydown')
+  .pipe(
+    map((event: KeyboardEvent) => {
+      const name = KeyUtil.codeToKey(''+event.keyCode);
+      if (name !== ''){
+        let keyMap = {};
+        keyMap[name] = event.code;
+        return keyMap;
+      } else {
+        return undefined;
+      }      
+    }),
+    filter((keyMap) => keyMap !== undefined)
+  );
+  
 
   export const keysDownPerFrame$ = keysDown$
   .pipe(

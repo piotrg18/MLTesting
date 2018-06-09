@@ -28,17 +28,73 @@ const gameArea: HTMLElement= document.getElementById('screen');
 
 const context = (gameArea as HTMLCanvasElement).getContext('2d');
 
-const gravity = 0.5;
+const gravity = 2000;
 
 
-const update = (deltaTime: number, state: Entity, inputData: any): any => {
-  
-    let mario = state["mario"] ;
-    mario.pos.x += mario.vel.x;
-    mario.pos.y += mario.vel.y;
-    mario.vel.y += gravity;
-    state['mario'] = mario;
+export class Trait {
+    NAME: string;
+    constructor(name) {
+        this.NAME = name;
+    }
 
+    update(entity:Entity, deltaTime) {
+        console.warn('Unhandled update call in Trait');
+    }
+}
+
+class Velocity extends Trait{
+    constructor(){
+        super('velocity');
+    }
+    update(entity:Entity, deltaTime) {
+        entity.pos.x += entity.vel.x * deltaTime;
+        entity.pos.y += entity.vel.y * deltaTime;
+    }
+}
+
+class Jump extends Trait {
+    engageTime: number;
+    velocity: number;
+    duration: number;
+    constructor(){
+        super('jump')
+        this.duration = 0.5;
+        this.velocity = 200;
+        this.engageTime = 0;
+    }
+    startJump() {
+        this.engageTime = this.duration;
+    }
+    update(entity:Entity,deltaTime){
+        if(this.engageTime > 0){
+            entity.vel.y = -this.velocity;
+            this.engageTime -= deltaTime 
+        }
+    }
+    cancelJump(){
+        this.engageTime = 0;
+    }
+}
+
+
+const update = (deltaTime: number, state: Entity, inputState: any): any => {
+
+    //console.log(inputState);
+    
+    console.log(state);
+    if(inputState.spacebar !== undefined ){
+         state['jump'].startJump();
+    }
+    else{
+        state['jump'].cancelJump();
+        
+    }
+    state.update((1/60));
+
+    state.vel.y += gravity * (1/60);
+    //state['mario'] = maro;
+    
+    //console.log(inputState);
 
    // console.log(initData);
    return state;
@@ -48,14 +104,16 @@ const update = (deltaTime: number, state: Entity, inputData: any): any => {
 
 const render = (state: any, initData:Compositor) => {
 
-    initData.draw(context, initMario['mario']);
+    initData.draw(context, state);
     
 }
 
 let initMario =  new Entity();
-initMario.pos.set(64,180);
-initMario.vel.set(2,-10);
-initMario['mario'] = initMario;
+initMario.pos.set(64,100);
+
+initMario.addTrait(new Velocity());
+initMario.addTrait(new Jump());
+
 
 const gameState$ = new BehaviorSubject<Entity>(initMario);
 
@@ -64,8 +122,8 @@ loadedFiles.subscribe((initData) =>
  {
 
     frames$.pipe(
-        withLatestFrom(gameState$),
-        map(([deltaTime,gameState]) => update(deltaTime,gameState, undefined)),
+        withLatestFrom(gameState$, keysDownPerFrame$),
+        map(([deltaTime,gameState, inputState]) => update(deltaTime,gameState, inputState)),
         tap((gameState) => gameState$.next(gameState))
     )
     .subscribe((gameState) => {
