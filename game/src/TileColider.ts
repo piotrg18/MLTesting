@@ -1,8 +1,8 @@
 import TileResolver from './TileResolver';
-import { Entity } from './Entity';
+import { Entity, Sides } from './Entity';
 
 export default class TileCollider {
-    tiles: any;
+    tiles: TileResolver;
     constructor(tileMatrix) {
         this.tiles = new TileResolver(tileMatrix);
     }
@@ -40,7 +40,7 @@ export default class TileCollider {
         });
     }
 
-    checkY(entity:Entity) {
+    checkY(entity) {
         let y;
         if (entity.vel.y > 0) {
             y = entity.pos.y + entity.size.y;
@@ -63,13 +63,17 @@ export default class TileCollider {
                 if (entity.pos.y + entity.size.y > match.y1) {
                     entity.pos.y = match.y1 - entity.size.y;
                     entity.vel.y = 0;
+
+                    entity.obstruct(Sides.BOTTOM);
                 }
             } else if (entity.vel.y < 0) {
                 if (entity.pos.y < match.y2) {
                     entity.pos.y = match.y2;
                     entity.vel.y = 0;
+
+                    entity.obstruct(Sides.TOP);
                 }
             }
         });
     }
-} 
+}

@@ -1,9 +1,19 @@
 import { Vector } from "./Vector";
 
+
+export const Sides = {
+    TOP: Symbol('top'),
+    BOTTOM: Symbol('bottom'),
+};
+
 export class Trait {
     NAME: string;
     constructor(name) {
         this.NAME = name;
+    }
+
+    obstruct(entity, side) {
+
     }
 
     update(entity:Entity, deltaTime) {
@@ -22,6 +32,12 @@ export class Entity{
         this.vel = new Vector(0, 0);
         this.size = new Vector(0, 0);
         this.traits = [];
+    }
+
+    obstruct(side) {
+        this.traits.forEach(trait => {
+            trait.obstruct(this, side);
+        });
     }
 
     addTrait(trait) {

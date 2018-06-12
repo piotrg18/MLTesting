@@ -92,10 +92,10 @@ const update = (deltaTime: number, state: Entity, inputState: any, initData:any)
     //console.log(state);
 
     if(inputState.spacebar == 1 ){
-         state['jump'].startJump();
+         state['jump'].start();
     }
     else if(inputState.spacebar == 0){
-        state['jump'].cancelJump();
+        state['jump'].cancel();
         
     }
    
@@ -107,7 +107,7 @@ const update = (deltaTime: number, state: Entity, inputState: any, initData:any)
     }
     
     if(state.pos.x > 100){
-        camera.pos.x = state.pos.x - 50;
+        camera.pos.x = state.pos.x - 100;
     }
 
     initData.level.update((1/60));
