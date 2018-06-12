@@ -8,7 +8,11 @@ export function loadImage(url) {
     });
 }
 
-export function loadLevel(url) {
+export function loadJSON(url) {
     return fetch(url)
     .then(r => r.json());
+}
+
+export function loadLevel(url) {
+    return loadJSON(url);
 } 

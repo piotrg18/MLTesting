@@ -15,7 +15,8 @@ module.exports = {
   plugins:[
     new CopyWebpackPlugin([
       {from:'public/img',to:'public'} ,
-      {from:'public/levels',to:'public'} 
+      {from:'public/levels',to:'public'} ,
+      {from:'public/sprites',to:'public'} 
     ]) 
   ],
   module: {

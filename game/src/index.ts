@@ -1,13 +1,15 @@
 import SpriteSheet from "./SpriteSheet";
 import {  Observable,of,animationFrameScheduler, forkJoin, from, BehaviorSubject  } from 'rxjs';
-import { buffer, bufferCount,expand, filter, map,  share, tap, withLatestFrom,timestamp} from 'rxjs/operators';;
-import { fromPromise } from "rxjs/internal-compatibility";
-import {loadImage,loadLevel} from "./loaders";
-import { frames$, keysDownPerFrame$ } from "./Utils";
+import { buffer, bufferCount,expand, filter, map,  share, tap, withLatestFrom,timestamp, switchMap, zip} from 'rxjs/operators';;
+import {loadImage,loadLevel, loadJSON} from "./loaders";
+import { frames$, keysDownOrUpPerFrame$ } from "./Utils";
 import { Compositor } from "./InitialData";
 import { Vector } from "./Vector";
 import { Entity } from "./Entity";
-
+import {Jump} from "./behaviour/jump"
+import {Velocity} from "./behaviour/velocity"
+import {Go} from "./behaviour/Go"
+import Camera from "./Camera";
 
 
 
@@ -18,112 +20,121 @@ let imageObservable =  from(loadImage("public/img/tiles.png"));
 let marioObservable =  from(loadImage("public/img/characters.gif"));
 let levelLoaders =  from(loadLevel("public/1-1.json"));
 
+let initMario =  new Entity();
+initMario.size.set(14, 16);
+initMario.pos.set(64,100);
+
+initMario.addTrait(new Go());
+//initMario.addTrait(new Velocity());
+initMario.addTrait(new Jump());
 
 
-let loadedFiles =  forkJoin(imageObservable,levelLoaders,marioObservable)
-                                    .pipe( 
-                                        map(([image,level,marioImage]) =>  { return new Compositor(image,level,marioImage)}));
+
+
+// let loadedFiles =  forkJoin(imageObservable,levelLoaders,marioObservable)
+//                                     .pipe( 
+//                                         map(([image,level,marioImage]) =>  { return new Compositor(image,level,marioImage,initMario)}));
 
 const gameArea: HTMLElement= document.getElementById('screen');
 
 const context = (gameArea as HTMLCanvasElement).getContext('2d');
 
-const gravity = 2000;
+
+const camera  = new Camera();
+
+window['camera'] = camera;
 
 
-export class Trait {
-    NAME: string;
-    constructor(name) {
-        this.NAME = name;
-    }
-
-    update(entity:Entity, deltaTime) {
-        console.warn('Unhandled update call in Trait');
-    }
-}
-
-class Velocity extends Trait{
-    constructor(){
-        super('velocity');
-    }
-    update(entity:Entity, deltaTime) {
-        entity.pos.x += entity.vel.x * deltaTime;
-        entity.pos.y += entity.vel.y * deltaTime;
-    }
-}
-
-class Jump extends Trait {
-    engageTime: number;
-    velocity: number;
-    duration: number;
-    constructor(){
-        super('jump')
-        this.duration = 0.5;
-        this.velocity = 200;
-        this.engageTime = 0;
-    }
-    startJump() {
-        this.engageTime = this.duration;
-    }
-    update(entity:Entity,deltaTime){
-        if(this.engageTime > 0){
-            entity.vel.y = -this.velocity;
-            this.engageTime -= deltaTime 
-        }
-    }
-    cancelJump(){
-        this.engageTime = 0;
-    }
-}
+let levelLoader = levelLoaders.pipe(
+    switchMap(res => 
+    {
+        const spriteSheet = res.spriteSheet;
+        return from(loadJSON(`/public/${spriteSheet}.json`)).pipe(map(t => {
+            return {level:res, sprites:t };
+        }))
+    }),
+    switchMap(sheetSpec => {
+        let imageUrl = sheetSpec.sprites.imageURL
+        return from(loadImage(`${imageUrl}`)).pipe(
+            map(image => {
+                const sprites = new SpriteSheet(
+                    image,
+                    sheetSpec.sprites.tileW,
+                    sheetSpec.sprites.tileH);
+        
+                sheetSpec.sprites.tiles.forEach(tileSpec => {
+                    sprites.defineTile(
+                        tileSpec.name,
+                        tileSpec.index[0],
+                        tileSpec.index[1]);
+                });
+                return  {  spriteSheet : sprites, mainLevel: sheetSpec.level };
+            })
+        );   
+    })
+    
+   
+);
 
 
-const update = (deltaTime: number, state: Entity, inputState: any): any => {
+let loadedAll =  forkJoin(levelLoader,marioObservable)
+.pipe(map( ([levelDetails,marioImage]) => {
+
+    return new Compositor(levelDetails,marioImage,initMario);
+}));
+
+
+
+const update = (deltaTime: number, state: Entity, inputState: any, initData:any): any => {
 
     //console.log(inputState);
     
-    console.log(state);
-    if(inputState.spacebar !== undefined ){
+    //console.log(state);
+
+    if(inputState.spacebar == 1 ){
          state['jump'].startJump();
     }
-    else{
+    else if(inputState.spacebar == 0){
         state['jump'].cancelJump();
         
     }
-    state.update((1/60));
-
-    state.vel.y += gravity * (1/60);
-    //state['mario'] = maro;
+   
+    if(inputState.right_arrow !== undefined){
+        state['go'].dir = inputState.right_arrow;
+    }
+    else if(inputState.left_arrow !== undefined){
+        state['go'].dir = -inputState.left_arrow;
+    }
     
-    //console.log(inputState);
+    if(state.pos.x > 100){
+        camera.pos.x = state.pos.x - 50;
+    }
 
-   // console.log(initData);
-   return state;
+    initData.level.update((1/60));
+   
+    return state;
 };
 
 
 
 const render = (state: any, initData:Compositor) => {
 
-    initData.draw(context, state);
+    initData.draw(context, state, camera );
     
 }
 
-let initMario =  new Entity();
-initMario.pos.set(64,100);
 
-initMario.addTrait(new Velocity());
-initMario.addTrait(new Jump());
 
 
 const gameState$ = new BehaviorSubject<Entity>(initMario);
 
 
-loadedFiles.subscribe((initData) =>
+loadedAll.subscribe((initData) =>
  {
 
     frames$.pipe(
-        withLatestFrom(gameState$, keysDownPerFrame$),
-        map(([deltaTime,gameState, inputState]) => update(deltaTime,gameState, inputState)),
+        withLatestFrom(gameState$, keysDownOrUpPerFrame$),
+        map(([deltaTime,gameState, inputState]) => update(deltaTime,gameState, inputState,initData)),
         tap((gameState) => gameState$.next(gameState))
     )
     .subscribe((gameState) => {
