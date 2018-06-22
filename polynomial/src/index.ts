@@ -91,12 +91,14 @@ const render = (deltaTime:number,inputMouse:MouseVector) => {
     context.strokeStyle = "#000000";
     context.fillRect (0, 0, width, height);
     if(inputMouse.state == 1){
+        
         let x = mapData(inputMouse.x, 0, width, -1, 1);
         let y = mapData(inputMouse.y, 0, height, 1, -1);
         x_vals.push(x);
         y_vals.push(y);
     }
-    else if(inputMouse.state == 0){
+    else{
+        //debugger;
         tf.tidy(() => {
             if (x_vals.length > 0) {
               const ys = tf.tensor1d(y_vals);

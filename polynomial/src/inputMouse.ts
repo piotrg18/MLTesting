@@ -1,5 +1,5 @@
 import { fromEvent, Observable, of,merge } from "rxjs";
-import {  expand, filter, map, share, buffer } from "rxjs/operators";
+import {  expand, filter, map, share, buffer, mergeMap, takeUntil, tap } from "rxjs/operators";
 
 const PRESSED = 1;
 const RELEASED = 0;
@@ -27,6 +27,8 @@ export const calculateStep: (prevFrame: FrameData) => Observable<FrameData> = (p
     })
   };
 
+const move$ = fromEvent(document, 'mousemove');
+
 const mouseDown$ = fromEvent(document, 'mousedown');
 const mouseUp$ = fromEvent(document, 'mouseup');
 
@@ -36,12 +38,19 @@ export class MouseVector{
     constructor(public state:number,public x:number, public y:number){}
 }
 
-const mouseDownorUp$ = tempMouseAction
+
+const paints$ = mouseDown$.pipe(
+    mergeMap(down => move$.pipe(takeUntil(mouseUp$))
+  ));
+
+
+
+const mouseDownorUp$ = merge(paints$,mouseUp$)
   .pipe(
     map((event: MouseEvent) => {
-    
-      const mouseState = event.type === 'mousedown' ? PRESSED : RELEASED;   
-      
+
+      const mouseState = event.type === 'mouseup' ? RELEASED : PRESSED;   
+      //console.log(event.type)
       return new MouseVector(mouseState, event.x, event.y);
     }),
     filter((keyMap) => keyMap !== undefined)
